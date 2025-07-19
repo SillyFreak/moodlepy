@@ -7,46 +7,41 @@ from moodle.attr import asdict as asdict_attr
 T = TypeVar("T")
 
 
-def to_dict(data: Any, name: str = "") -> Any:
+def to_dict(data: dict, name: str = "") -> dict:
     """Properly format query string for webservice request
+    The passed object itself must be a dict, but the returned value will be
+    flattened to a dict with keys like `name[key]` or `name[index][key]`.
 
     Args:
-        data (Any): Query to be formated
+        data (dict): Query to be formated
         name (str, optional): The key of the data. Defaults to "".
 
     Returns:
-        Any: Formated data
+        dict: Formated data
     """
-    if not data:
-        return data
-    if isinstance(data, list):
-        out = {}
-        for idx, val in enumerate(data):
-            val = to_dict(val)
-            if isinstance(val, dict):
-                for key, value in val.items():
-                    out[f"{name}[{idx}][{key}]"] = val[key]
-            else:
-                out_key = name
-                # Check if data required name prefix
-                if hasattr(data, "name"):
-                    out_key += f"[{getattr(data, 'name')}]"
-                out_key += f"[{idx}]"
-                out[out_key] = val
-        return out
-    if isinstance(data, dict):
-        out = {}
-        for key, value in data.items():
-            if isinstance(value, list):
-                out.update(to_dict(value, key))
-            else:
-                out[key] = value
-        return out
-    if has(data):
-        return asdict_attr(data)
-    if isinstance(data, datetime):
-        return datetime.timestamp(data)
-    return data
+
+    result = {}
+    def inner(prefix: str, data: Any) -> dict:
+        pairs = None
+        if isinstance(data, list):
+            pairs = enumerate(data)
+        elif isinstance(data, dict):
+            pairs = data.items()
+        elif has(data):
+            pairs = asdict_attr(data).items()
+
+        if pairs is not None:
+            for key, value in pairs:
+                inner(f"{prefix}[{key}]", value)
+        else:
+            if isinstance(data, datetime):
+                data = datetime.timestamp(data)
+            result[prefix] = data
+
+    for key, value in data.items():
+        inner(key, value)
+
+    return result
 
 
 def fromtimestamp(d: str):
