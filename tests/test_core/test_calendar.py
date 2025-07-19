@@ -39,7 +39,7 @@ class TestCalendar:
         pass
 
     def test_get_calendar_events(self, moodle):
-        events = moodle.core.calendar.get_calendar_events()
+        events = moodle.core.calendar.get_calendar_events(options=Events.Options(userevents=1))
         assert isinstance(events, Events)
 
     def test_get_calendar_monthly_view(self, moodle):
