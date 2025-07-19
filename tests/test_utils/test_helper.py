@@ -22,19 +22,19 @@ class TestHelper:
         assert result == { 'a[0][x]': 1, 'a[1][x]': 2, 'b[0][y]': 2, 'b[0][z]': 3 }
 
         # dict with nested dicts
-        # result = to_dict(dict(a=dict(x=1, y=2), b=dict(z=3)))
-        # assert result == { 'a[x]': 1, 'a[y]': 2, 'b[z]': 3 }
+        result = to_dict(dict(a=dict(x=1, y=2), b=dict(z=3)))
+        assert result == { 'a[x]': 1, 'a[y]': 2, 'b[z]': 3 }
 
         # dict with lists of lists
-        # result = to_dict(dict(a=[[1, 2], [3, 4]], b=[[5], [6, 7]]))
-        # assert result == {
-        #     'a[0][0]': 1, 'a[0][1]': 2, 'a[1][0]': 3, 'a[1][1]': 4,
-        #     'b[0][0]': 5, 'b[1][0]': 6, 'b[1][1]': 7,
-        # }
+        result = to_dict(dict(a=[[1, 2], [3, 4]], b=[[5], [6, 7]]))
+        assert result == {
+            'a[0][0]': 1, 'a[0][1]': 2, 'a[1][0]': 3, 'a[1][1]': 4,
+            'b[0][0]': 5, 'b[1][0]': 6, 'b[1][1]': 7,
+        }
 
         # dict with list of nested dicts
-        # result = to_dict(dict(a=[dict(x=1, nested=dict(y=2))]))
-        # assert result == { 'a[0][x]': 1, 'a[0][nested][y]': 2 }
+        result = to_dict(dict(a=[dict(x=1, nested=dict(y=2))]))
+        assert result == { 'a[0][x]': 1, 'a[0][nested][y]': 2 }
 
         @attr.s
         class MyAttrClass:
@@ -46,12 +46,12 @@ class TestHelper:
         assert result == { 'x': 1, 'y': 2 }
 
         # dict with attr class
-        # result = to_dict(dict(a=MyAttrClass(x=1, y=2)))
-        # assert result == { 'a[x]': 1, 'a[y]': 2 }
+        result = to_dict(dict(a=MyAttrClass(x=1, y=2)))
+        assert result == { 'a[x]': 1, 'a[y]': 2 }
 
         # dict with datetime
-        # result = to_dict(dict(a=datetime(2025, 1, 1)))
-        # assert result == { 'a': datetime(2025, 1, 1).timestamp() }
+        result = to_dict(dict(a=datetime(2025, 1, 1)))
+        assert result == { 'a': datetime(2025, 1, 1).timestamp() }
 
         # dict with list of datetimes
         result = to_dict(dict(a=[datetime(2025, 1, 1)]))
