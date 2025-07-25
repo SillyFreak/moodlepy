@@ -1,6 +1,7 @@
 from typing import Any
 
 from moodle.mdl import Mdl
+from moodle.upload import Upload
 
 from moodle.auth import Auth
 from moodle.block import Block
@@ -19,6 +20,11 @@ class Moodle(Mdl):
 
     def __call__(self, wsfunction: str, moodlewsrestformat="json", **kwargs) -> Any:
         return self.post(wsfunction, moodlewsrestformat, **kwargs)
+
+    @property  # type: ignore
+    @lazy
+    def upload(self) -> Upload:
+        return Upload(self)
 
     @property  # type: ignore
     @lazy
