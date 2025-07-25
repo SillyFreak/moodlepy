@@ -99,6 +99,52 @@ class Mdl:
             return self.process_response(data)
         return res.text
 
+    def post_upload(
+        self, *files,
+        moodlewsrestformat="json",
+        itemid: int = 0, filepath: str = "/"
+    ) -> Any:
+        """Send post request to file upload endpoint.
+
+        Args:
+            files (file-like-objects, multiple): The files to upload.
+            moodlewsrestformat (str, optional): Expected format. Defaults to "json".
+            itemid (int, optional): itemid to upload into. Defaults to 0.
+            filepath (str, optional): file path under which to upload. Defaults to '/'.
+
+        Raises:
+            NetworkMoodleException: If request failed
+            EmptyResponseException: If the response empty
+            UploadUrlException: If the upload endpoint URL can't be inferred
+            MoodleException: Error from server
+
+        Returns:
+            Any: Raw data (str) or dict
+        """
+        if not self.url.endswith("/rest/server.php"):
+            raise UploadUrlException()
+
+        params = {
+            "token": self.token,
+            "moodlewsrestformat": moodlewsrestformat,
+            "itemid": itemid,
+            "filepath": filepath,
+        }
+        try:
+            res = self.session.post(
+                self.url.replace("/rest/server.php", "/upload.php"),
+                params=params,
+                files={f"file_{i}": file for i, file in enumerate(files, start=1)},
+            )
+        except RequestException as e:
+            raise NetworkMoodleException(e)
+        if not res.ok or not res.text:
+            raise EmptyResponseException()
+        if res.ok and moodlewsrestformat == "json":
+            data = json.loads(res.text)
+            return self.process_response(data)
+        return res.text
+
     def process_response(self, data: Any) -> Any:
         """Process data to handle exception or warnings
 

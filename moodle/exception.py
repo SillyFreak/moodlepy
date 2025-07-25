@@ -37,6 +37,11 @@ class InvalidCredentialException(BaseException):
 
 
 @dataclass
+class UploadUrlException(BaseException):
+    message: str = "File Upload URL can not be determined!"
+
+
+@dataclass
 class NetworkMoodleException(BaseException):
     """Moodle wrapper for network related network error"""
 
