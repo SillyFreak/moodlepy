@@ -166,7 +166,14 @@ class Mdl:
                 elif isinstance(data["warnings"], dict):
                     warning = MoodleWarning(**data["warnings"])  # type: ignore
                     self.logger.warning(str(warning))
-            if "exception" in data or "errorcode" in data:
+            if "error" in data:
+                # upload.php errors are sometimes structured a bit differently
+                error = data.pop("error")
+                data.pop("stacktrace")
+                data.pop("reproductionlink")
+                data["message"] = error
+                raise MoodleException(**data)  # type: ignore
+            elif "exception" in data or "errorcode" in data:
                 raise MoodleException(**data)  # type: ignore
         return data
 
